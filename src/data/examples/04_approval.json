@@ -1,0 +1,9 @@
+{
+  "ticket_id": "T-20260815-0001",
+  "approved": true,
+  "approved_by": "human-supervisor-l1",
+  "approval_evidence": {"channel": "approval-console", "timestamp": "2026-08-15T09:18:02+08:00"},
+  "action_hash": "sha256:9f2a4c7e1b3d5f6a8c0e2d4b6a8c0e2f",
+  "note": "大额退款，单人审批通过（限额内）",
+  "status": "APPROVED"
+}

@@ -1,0 +1,94 @@
+# AgentTeams 实例与客服团队配置示例（复赛部署时按实际环境调整）
+instance:
+  name: zhifu-fangzhou-cs
+  region: cn-hangzhou
+  namespace: customer-service
+
+model_providers:
+  - id: dashscope-qwen
+    provider: dashscope
+    model: qwen-max
+    usage: [reasoning, planning]
+  - id: openai-compatible-fallback
+    provider: openai_compatible
+    base_url: https://your-gateway.example.com/v1
+    model: your-fallback-model
+    usage: [fallback]
+
+team:
+  name: customer-service-team
+  leader:
+    name: leader-main
+    role: orchestrator
+    description: 主控 Agent：任务拆解、编排调度、上下文路由、状态追踪、升级决策
+    model: dashscope-qwen
+    permissions: [ticket:read, orchestrate:all]
+  workers:
+    - name: intake-agent
+      role: intake
+      description: 聚合 Agent：多渠道接入、归一化、去重、工单建档
+      skills: [intake.ingest]
+      permissions: [queue:read, ticket:write]
+      model: dashscope-qwen
+    - name: triage-agent
+      role: triage
+      description: 分诊 Agent：意图识别、分类分级、信息补全
+      skills: [triage.intent]
+      permissions: [ticket:read, ticket:write-status]
+      model: dashscope-qwen
+    - name: planner-agent
+      role: planner
+      description: 方案 Agent：RAG 检索、生成合规方案、发起审批
+      skills: [plan.policy_rag]
+      permissions: [kb:read, case:read, ticket:write-plan]
+      model: dashscope-qwen
+    - name: executor-agent
+      role: executor
+      description: 执行 Agent：Skill/MCP 执行、幂等、回滚
+      skills: [exec.refund, exec.account_change]
+      permissions: [payment:execute-limit, crm:update-whitelist, ticket:write-evidence]
+      model: dashscope-qwen
+    - name: verifier-agent
+      role: verifier
+      description: 核验 Agent：结果核验、满意度确认、证据包
+      skills: [verify.result]
+      permissions: [ticket:read, notify:send-template]
+      model: dashscope-qwen
+    - name: reviewer-agent
+      role: reviewer
+      description: 复盘 Agent：根因分析、知识沉淀、Skill 策略建议
+      skills: [review.case]
+      permissions: [case:read, kb:propose-write]
+      model: dashscope-qwen
+
+mcp_servers:
+  - name: ticketing-mcp
+    url: http://ticketing-mcp:8000
+    tools: [ticket.create, ticket.update, ticket.get]
+  - name: payment-mcp
+    url: http://payment-mcp:8001
+    tools: [refund.create, refund.get, refund.rollback]
+  - name: crm-mcp
+    url: http://crm-mcp:8002
+    tools: [account.update, account.get]
+  - name: kb-mcp
+    url: http://kb-mcp:8003
+    tools: [kb.search]
+  - name: notify-mcp
+    url: http://notify-mcp:8004
+    tools: [notify.send]
+
+context:
+  ticket_context_store: object-storage + vector-db
+  state_machine: NEW -> TRIAGED -> PLANNED -> APPROVED -> EXECUTED -> VERIFIED -> CLOSED | ESCALATED
+
+observability:
+  exporter: otlp
+  endpoint: http://agentloop-collector:4317
+  metrics: [ticket_latency, first_contact_resolution, human_intervention_rate, token_usage]
+
+security:
+  approval_required: [high_risk_refund, account_sensitive_change, batch_operation]
+  idempotency: enforced-by-skill
+  rollback: per-action-rollback-scripts
+  audit: all-actions-logged

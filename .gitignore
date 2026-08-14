@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+ppt/preview/
+aiedu/
+agentinfra/
+aiglasses/
+*.zip
