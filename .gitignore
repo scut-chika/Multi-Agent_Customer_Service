@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 ppt/preview/
+pdf/_html/
 aiedu/
 agentinfra/
 aiglasses/
