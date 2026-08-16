@@ -1,0 +1,13 @@
+{
+  "ticket_id": "T-20260815-0001",
+  "check_items": [
+    {"item": "refund_amount", "expected": 199.0, "actual": 199.0, "pass": true},
+    {"item": "refund_status", "expected": "SUCCESS", "actual": "SUCCESS", "pass": true},
+    {"item": "ticket_evidence", "expected": "written", "actual": "written", "pass": true}
+  ],
+  "verdict": "PASS",
+  "satisfaction": {"channel": "sms", "status": "satisfied", "score": 5},
+  "report": "VR-20260815-0001",
+  "status": "VERIFIED",
+  "owner_agent": "verifier-agent"
+}

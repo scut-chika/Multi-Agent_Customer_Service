@@ -1,0 +1,13 @@
+样例校验结果：PASS（全部检查通过）
+[01_ticket.json] 字段齐全, status=NEW, ticket_id=T-20260815-0001
+[02_triage.json] 字段齐全, status=TRIAGED, ticket_id=T-20260815-0001
+[03_plan.json] 字段齐全, status=PLANNED, ticket_id=T-20260815-0001
+[04_approval.json] 字段齐全, status=APPROVED, ticket_id=T-20260815-0001
+[05_execution.json] 字段齐全, status=EXECUTED, ticket_id=T-20260815-0001
+[06_verification.json] 字段齐全, status=VERIFIED, ticket_id=T-20260815-0001
+[07_review.json] 字段齐全, status=CLOSED, ticket_id=T-20260815-0001
+[一致性] 全部环节共享同一工单: T-20260815-0001
+[状态机] 流转正确: NEW → TRIAGED → PLANNED → APPROVED → EXECUTED → VERIFIED → CLOSED
+[业务校验] 方案金额 199.0 = 执行金额 199.0 = 核验金额 199.0
+[审批校验] 高风险退款已通过人工审批（human-supervisor-l1）
+结论：样例数据完整、状态机流转正确、业务与审批链路一致。

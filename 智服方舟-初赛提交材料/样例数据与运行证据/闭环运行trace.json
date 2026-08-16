@@ -1,0 +1,285 @@
+{
+  "trace_id": "trace-6a1fe7b0a9a8",
+  "spans": [
+    {
+      "name": "leader-main",
+      "kind": "agent",
+      "agent": "leader-main",
+      "duration_ms": 59.5,
+      "detail": {
+        "status": "CLOSED",
+        "escalated": false
+      }
+    },
+    {
+      "name": "intake-agent",
+      "kind": "agent",
+      "agent": "intake-agent",
+      "duration_ms": 15.9,
+      "detail": {
+        "ticket_id": "T-20260815-0001",
+        "dedup": {
+          "matched": false,
+          "note": "首次建档"
+        }
+      }
+    },
+    {
+      "name": "ticketing.ticket.find_by_fingerprint",
+      "kind": "tool",
+      "agent": null,
+      "duration_ms": 0.0,
+      "detail": {
+        "arguments": {
+          "fingerprint": "fp:a2a7984650f06e2a7176e11200c7c962476a661df2705e221be8667b4bdb0d2e"
+        },
+        "result": {
+          "found": false,
+          "ticket_id": null
+        },
+        "ok": true
+      }
+    },
+    {
+      "name": "ticketing.ticket.create",
+      "kind": "tool",
+      "agent": null,
+      "duration_ms": 0.0,
+      "detail": {
+        "arguments": {
+          "ticket_id": "T-20260815-0001",
+          "channels": [
+            "web_im",
+            "email"
+          ],
+          "fingerprint": "fp:a2a7984650f06e2a7176e11200c7c962476a661df2705e221be8667b4bdb0d2e",
+          "raw_snippet": "（脱敏）用户反馈订单 20260815001 少了一件商品，要求退款 199 元。"
+        },
+        "result": {
+          "created": true,
+          "ticket": {
+            "ticket_id": "T-20260815-0001",
+            "channels": [
+              "web_im",
+              "email"
+            ],
+            "fingerprint": "fp:a2a7984650f06e2a7176e11200c7c962476a661df2705e221be8667b4bdb0d2e",
+            "status": "NEW",
+            "raw_snippet": "（脱敏）用户反馈订单 20260815001 少了一件商品，要求退款 199 元。",
+            "created_at": "2026-08-16T22:16:28+08:00"
+          }
+        },
+        "ok": true
+      }
+    },
+    {
+      "name": "triage-agent",
+      "kind": "agent",
+      "agent": "triage-agent",
+      "duration_ms": 0.2,
+      "detail": {
+        "intent": "refund",
+        "confidence": 0.83,
+        "llm": false
+      }
+    },
+    {
+      "name": "planner-agent",
+      "kind": "agent",
+      "agent": "planner-agent",
+      "duration_ms": 2.3,
+      "detail": {
+        "plan_id": "P-20260816-89788",
+        "evidence_refs": [
+          "kb:SOP-RF-2026",
+          "kb:policy-refund-window"
+        ],
+        "approval_required": true
+      }
+    },
+    {
+      "name": "kb.kb.search",
+      "kind": "tool",
+      "agent": null,
+      "duration_ms": 0.0,
+      "detail": {
+        "arguments": {
+          "query": "refund 20260815001 （脱敏）用户反馈订单 20260815001 少了一件商品，要求退款 199 元",
+          "top_k": 3
+        },
+        "result": {
+          "hits": [
+            {
+              "doc_id": "kb:SOP-RF-2026",
+              "title": "退款SOP-2026",
+              "score": 1.5,
+              "snippet": "漏发/缺件可直接退款；金额不超过5000元且订单可核销；需先核对订单状态。"
+            },
+            {
+              "doc_id": "kb:policy-refund-window",
+              "title": "退款时效政策",
+              "score": 0.5,
+              "snippet": "签收7日内可申请退款；退款原路返回，3个工作日内到账。"
+            },
+            {
+              "doc_id": "kb:case-0188",
+              "title": "历史案例C-0188",
+              "score": 0.5,
+              "snippet": "漏发退款案例：先核销订单再退款，满意度高。"
+            }
+          ]
+        },
+        "ok": true
+      }
+    },
+    {
+      "name": "executor-agent",
+      "kind": "agent",
+      "agent": "executor-agent",
+      "duration_ms": 26.5,
+      "detail": {
+        "summary": "SUCCESS"
+      }
+    },
+    {
+      "name": "payment.refund.create",
+      "kind": "tool",
+      "agent": null,
+      "duration_ms": 0.0,
+      "detail": {
+        "arguments": {
+          "order_id": "20260815001",
+          "amount": 199.0,
+          "currency": "CNY",
+          "idempotency_key": "refund:T-20260815-0001:20260815001:0",
+          "approval_token": "a6d41eb9aec79fb26afcf0f96ca7f35014d121dacad8a91c61ae56506bde903c"
+        },
+        "result": {
+          "status": "DUPLICATE",
+          "refund": {
+            "refund_txn_id": "TX-1786889769",
+            "order_id": "20260815001",
+            "amount": 199.0,
+            "currency": "CNY",
+            "status": "SUCCESS",
+            "idempotency_key": "refund:T-20260815-0001:20260815001:0",
+            "created_at": "2026-08-16T22:16:09+08:00"
+          },
+          "note": "幂等键命中，返回既有结果"
+        },
+        "ok": true
+      }
+    },
+    {
+      "name": "ticketing.ticket.update",
+      "kind": "tool",
+      "agent": null,
+      "duration_ms": 0.0,
+      "detail": {
+        "arguments": {
+          "ticket_id": "T-20260815-0001",
+          "status": "EXECUTED",
+          "note": "退款完成 txn=TX-1786889769"
+        },
+        "result": {
+          "updated": true,
+          "ticket": {
+            "ticket_id": "T-20260815-0001",
+            "channels": [
+              "web_im",
+              "email"
+            ],
+            "fingerprint": "fp:a2a7984650f06e2a7176e11200c7c962476a661df2705e221be8667b4bdb0d2e",
+            "status": "EXECUTED",
+            "raw_snippet": "（脱敏）用户反馈订单 20260815001 少了一件商品，要求退款 199 元。",
+            "created_at": "2026-08-16T22:16:28+08:00",
+            "notes": [
+              {
+                "at": "2026-08-16T22:16:28+08:00",
+                "note": "退款完成 txn=TX-1786889769"
+              }
+            ]
+          }
+        },
+        "ok": true
+      }
+    },
+    {
+      "name": "verifier-agent",
+      "kind": "agent",
+      "agent": "verifier-agent",
+      "duration_ms": 2.1,
+      "detail": {
+        "verdict": "PASS"
+      }
+    },
+    {
+      "name": "notify.notify.send",
+      "kind": "tool",
+      "agent": null,
+      "duration_ms": 0.0,
+      "detail": {
+        "arguments": {
+          "channel": "sms",
+          "template": "satisfaction_survey",
+          "params": {
+            "ticket_id": "T-20260815-0001",
+            "score": 5
+          },
+          "message_id": "sat-T-20260815-0001"
+        },
+        "result": {
+          "sent": true,
+          "message_id": "sat-T-20260815-0001",
+          "status": "SENT"
+        },
+        "ok": true
+      }
+    },
+    {
+      "name": "reviewer-agent",
+      "kind": "agent",
+      "agent": "reviewer-agent",
+      "duration_ms": 12.3,
+      "detail": {
+        "root_cause": "待人工复核",
+        "tags": [
+          "refund",
+          "high_risk"
+        ]
+      }
+    },
+    {
+      "name": "kb.kb.upsert",
+      "kind": "tool",
+      "agent": null,
+      "duration_ms": 0.0,
+      "detail": {
+        "arguments": {
+          "doc_id": "kb:case-20260816-89789",
+          "title": "复盘：refund工单T-20260815-0001",
+          "content": "根因：待人工复核；核验：PASS；满意度：5",
+          "tags": [
+            "refund",
+            "high_risk"
+          ],
+          "approved_by": "reviewer-human-approver"
+        },
+        "result": {
+          "updated": true,
+          "replaced": false,
+          "doc": {
+            "doc_id": "kb:case-20260816-89789",
+            "title": "复盘：refund工单T-20260815-0001",
+            "content": "根因：待人工复核；核验：PASS；满意度：5",
+            "tags": [
+              "refund",
+              "high_risk"
+            ]
+          }
+        },
+        "ok": true
+      }
+    }
+  ]
+}

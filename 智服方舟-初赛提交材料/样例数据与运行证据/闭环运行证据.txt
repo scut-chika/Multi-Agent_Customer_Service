@@ -1,0 +1,57 @@
+==================================================================
+智服方舟 · 多 Agent 客服自主闭环 —— 运行证据
+==================================================================
+工单号：T-20260815-0001
+TraceID：trace-6a1fe7b0a9a8
+运行时间：2026-08-16 22:16:29
+最终状态：CLOSED
+
+--- 协作过程（Ticket Context 消息流）---
+  [NEW] leader-main: 任务接收：渠道=['web_im', 'email']，开始编排
+  [NEW] skill: 新建工单 T-20260815-0001，渠道=['web_im', 'email']
+  [NEW] intake-agent: 接入完成：首次建档
+  [TRIAGED] leader-main: 任务拆解：分配分诊 Agent
+  [TRIAGED] triage-agent: 意图=refund 风险=high 紧急度=medium 置信度=0.83
+  [PLANNED] leader-main: 上下文传递：意图/分级写入 Ticket Context
+  [PLANNED] planner-agent: 方案 P-20260816-89788 生成，引用 2 份证据，需审批=True
+  [PLANNED] leader-main: 审批通过：human-supervisor-l1，凭证=a6d41eb9aec7...
+  [APPROVED] skill: 幂等命中：退款单已存在（TX-1786889769），复用既有结果
+  [APPROVED] skill: 退款完成 TX-1786889769
+  [APPROVED] executor-agent: 执行完成：SUCCESS
+  [EXECUTED] skill: 核验PASS，满意度=5
+  [EXECUTED] verifier-agent: 核验通过 VR-20260816-89789，满意度=5
+  [VERIFIED] skill: 复盘完成：待人工复核
+  [VERIFIED] reviewer-agent: 复盘完成：根因=待人工复核，知识更新=1条
+  [CLOSED] leader-main: 经验沉淀：复盘结论与知识库更新
+
+--- 结果摘要 ---
+  意图：refund（置信度 0.83）风险：high
+  方案：P-20260816-89788，证据引用：2 份
+  审批：True（human-supervisor-l1）
+  执行：SUCCESS
+  核验：PASS，满意度：5
+  复盘：根因=待人工复核，知识更新=1 条
+  升级：否
+  总耗时：59.5 ms
+
+--- 全链路追踪（Trace）---
+[Agent] leader-main (59.5ms) leader-main
+[Agent] intake-agent (15.9ms) intake-agent
+[MCP] ticketing.ticket.find_by_fingerprint (0.0ms)
+[MCP] ticketing.ticket.create (0.0ms)
+[Agent] triage-agent (0.2ms) triage-agent
+[Agent] planner-agent (2.3ms) planner-agent
+[MCP] kb.kb.search (0.0ms)
+[Agent] executor-agent (26.5ms) executor-agent
+[MCP] payment.refund.create (0.0ms)
+[MCP] ticketing.ticket.update (0.0ms)
+[Agent] verifier-agent (2.1ms) verifier-agent
+[MCP] notify.notify.send (0.0ms)
+[Agent] reviewer-agent (12.3ms) reviewer-agent
+[MCP] kb.kb.upsert (0.0ms)
+
+Trace 明细：C:\project\src\data\examples\闭环运行trace.json
+证据报告：C:\project\src\data\examples\闭环运行证据.txt
+
+说明：本证据由本地零依赖闭环生成；MCP 为参考实现，迁移真实系统仅需替换工具后端。
+==================================================================

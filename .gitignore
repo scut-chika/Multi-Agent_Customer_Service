@@ -5,3 +5,4 @@ aiedu/
 agentinfra/
 aiglasses/
 *.zip
+src/.runtime/

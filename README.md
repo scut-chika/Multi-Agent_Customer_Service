@@ -17,12 +17,16 @@
 │   ├── build_ppt.py          # PPT 生成脚本（python-pptx）
 │   └── check_examples.py     # 样例输入输出校验脚本（可运行证据）
 └── src/                      # 可执行 AgentTeams 代码包（复赛可运行化的骨架）
-    ├── README.md             # 运行入口、依赖说明
+    ├── README.md             # 运行说明（本地零依赖演示 / 真实 AgentTeams 部署）
+    ├── main.py               # 运行入口：Leader + 6 Worker + 7 Skill + 5 MCP 完整闭环
+    ├── run_demo.ps1 / .sh    # 一键运行脚本
+    ├── agents/               # 1 个 Leader + 6 个职能 Worker 实现
+    ├── engine/               # Ticket Context / 状态机 / Trace / LLM / 审批
+    ├── skills/               # 7 个核心 Skill 的 Python 实现 + 注册清单
+    ├── mcp/                  # 5 个 MCP 参考 Server + 客户端 + 工具契约
     ├── config/               # AgentTeams / Skill 配置
     ├── identities/           # 各 Agent 身份定义
-    ├── skills/               # 核心 Skill 定义
-    ├── mcp/                  # 外部工具集成契约（迁移 MCP 的前置设计）
-    └── data/examples/        # 样例输入输出
+    └── data/examples/        # 样例输入输出与运行证据
 ```
 
 ## 交付内容与对应要求

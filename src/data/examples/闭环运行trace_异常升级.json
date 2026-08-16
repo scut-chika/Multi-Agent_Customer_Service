@@ -1,0 +1,133 @@
+{
+  "trace_id": "trace-a60a97a03b86",
+  "spans": [
+    {
+      "name": "leader-main",
+      "kind": "agent",
+      "agent": "leader-main",
+      "duration_ms": 19.0,
+      "detail": {
+        "status": "ESCALATED",
+        "escalated": true
+      }
+    },
+    {
+      "name": "intake-agent",
+      "kind": "agent",
+      "agent": "intake-agent",
+      "duration_ms": 16.3,
+      "detail": {
+        "ticket_id": "T-20260816-0008",
+        "dedup": {
+          "matched": false,
+          "note": "首次建档"
+        }
+      }
+    },
+    {
+      "name": "ticketing.ticket.find_by_fingerprint",
+      "kind": "tool",
+      "agent": null,
+      "duration_ms": 0.0,
+      "detail": {
+        "arguments": {
+          "fingerprint": "fp:8e02be92a3c7c903627e8f549078296e41dd1515d6a990cf6a17abb0b56d7454"
+        },
+        "result": {
+          "found": false,
+          "ticket_id": null
+        },
+        "ok": true
+      }
+    },
+    {
+      "name": "ticketing.ticket.create",
+      "kind": "tool",
+      "agent": null,
+      "duration_ms": 0.0,
+      "detail": {
+        "arguments": {
+          "ticket_id": "T-20260816-0008",
+          "channels": [
+            "social_comment"
+          ],
+          "fingerprint": "fp:8e02be92a3c7c903627e8f549078296e41dd1515d6a990cf6a17abb0b56d7454",
+          "raw_snippet": "（脱敏）有人在评论里发了一串看不懂的符号和表情。"
+        },
+        "result": {
+          "created": true,
+          "ticket": {
+            "ticket_id": "T-20260816-0008",
+            "channels": [
+              "social_comment"
+            ],
+            "fingerprint": "fp:8e02be92a3c7c903627e8f549078296e41dd1515d6a990cf6a17abb0b56d7454",
+            "status": "NEW",
+            "raw_snippet": "（脱敏）有人在评论里发了一串看不懂的符号和表情。",
+            "created_at": "2026-08-16T22:16:27+08:00"
+          }
+        },
+        "ok": true
+      }
+    },
+    {
+      "name": "triage-agent",
+      "kind": "agent",
+      "agent": "triage-agent",
+      "duration_ms": 0.3,
+      "detail": {
+        "intent": "unknown",
+        "confidence": 0.4,
+        "llm": false
+      }
+    },
+    {
+      "name": "reviewer-agent",
+      "kind": "agent",
+      "agent": "reviewer-agent",
+      "duration_ms": 2.3,
+      "detail": {
+        "root_cause": "待人工复核",
+        "tags": [
+          "unknown",
+          "normal",
+          "needs_review"
+        ]
+      }
+    },
+    {
+      "name": "kb.kb.upsert",
+      "kind": "tool",
+      "agent": null,
+      "duration_ms": 0.0,
+      "detail": {
+        "arguments": {
+          "doc_id": "kb:case-20260816-89787",
+          "title": "复盘：unknown工单T-20260816-0008",
+          "content": "根因：待人工复核；核验：FAIL；满意度：5",
+          "tags": [
+            "unknown",
+            "normal",
+            "needs_review"
+          ],
+          "approved_by": "reviewer-human-approver"
+        },
+        "result": {
+          "updated": true,
+          "replaced": false,
+          "doc": {
+            "doc_id": "kb:case-20260816-89787",
+            "title": "复盘：unknown工单T-20260816-0008",
+            "content": "根因：待人工复核；核验：FAIL；满意度：5",
+            "tags": [
+              "unknown",
+              "normal",
+              "needs_review"
+            ]
+          }
+        },
+        "ok": true
+      }
+    }
+  ]
+}

@@ -64,16 +64,16 @@ team:
 mcp_servers:
   - name: ticketing-mcp
     url: http://ticketing-mcp:8000
-    tools: [ticket.create, ticket.get, ticket.find_by_fingerprint, ticket.update]
+    tools: [ticket.create, ticket.update, ticket.get]
   - name: payment-mcp
     url: http://payment-mcp:8001
     tools: [refund.create, refund.get, refund.rollback]
   - name: crm-mcp
     url: http://crm-mcp:8002
-    tools: [account.get, account.update]
+    tools: [account.update, account.get]
   - name: kb-mcp
     url: http://kb-mcp:8003
-    tools: [kb.search, kb.upsert]
+    tools: [kb.search]
   - name: notify-mcp
     url: http://notify-mcp:8004
     tools: [notify.send]

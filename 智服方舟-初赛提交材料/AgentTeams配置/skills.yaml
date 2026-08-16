@@ -1,0 +1,72 @@
+# 核心 Skill 清单（九要素机器可读版，与 docs/Skill清单.md 一致）
+skills:
+  - name: intake.ingest
+    purpose: 多渠道消息接入、归一化与去重，生成标准工单
+    input: 原始消息集合（邮件/IM/电话转写/社媒）
+    output: 标准工单 Ticket（含会话指纹）
+    call_condition: 收到任一渠道新消息
+    depends_on: [消息队列, 对象存储, 向量库(指纹)]
+    failure_handling: 单条解析失败隔离重试；重复冲突合并并记录
+    security: 输入消息先脱敏；仅写工单表
+    reuse: 复用于任一多来源工单接入场景
+    workflow_relation: 聚合 Agent 调用，产出工单上下文
+  - name: triage.intent
+    purpose: 意图识别、分类分级与信息补全
+    input: 工单文本
+    output: 意图、槽位、紧急度/风险等级
+    call_condition: 工单建档完成
+    depends_on: [分类模型/LLM, 历史工单库]
+    failure_handling: 置信度低于阈值则转人工追问
+    security: 分级字段受 Schema 约束
+    reuse: 复用于客服/运维/政务等工单分诊
+    workflow_relation: 分诊 Agent 调用，产出分级上下文
+  - name: plan.policy_rag
+    purpose: 基于 RAG 检索策略并生成合规处理方案
+    input: 工单 + 分级
+    output: 处理方案（含证据引用与风险等级）
+    call_condition: 工单完成分级且信息完整
+    depends_on: [知识库RAG(向量库+重排), 历史案例库]
+    failure_handling: 检索不足时标注“证据不足”并升级
+    security: 只读策略库；方案需合规校验
+    reuse: 任何“查规则出方案”的决策场景
+    workflow_relation: 方案 Agent 调用，产出方案上下文
+  - name: exec.refund
+    purpose: 退款执行（幂等），回写工单证据
+    input: 批准后的退款单（含审批凭证与幂等键）
+    output: 退款结果凭证 refund_txn_id / evidence
+    call_condition: 方案已批准；金额白名单校验通过
+    depends_on: [支付网关MCP, 工单系统MCP, 审计日志]
+    failure_handling: 重试≤3次；幂等冲突查既有结果；失败回滚并升级
+    security: 白名单账户+限额；密钥由AgentTeams注入；全程审计
+    reuse: 换货/退票/改签复用同一幂等执行模式
+    workflow_relation: 执行 Agent 调用；下游交核验 Agent
+  - name: exec.account_change
+    purpose: 账户信息变更执行（幂等，二次确认）
+    input: 批准后的变更单
+    output: 变更结果凭证
+    call_condition: 方案已批准；客户已二次确认
+    depends_on: [CRM/账户系统MCP]
+    failure_handling: 幂等键冲突时查询现状，不重复执行
+    security: 敏感字段二次确认+审计
+    reuse: 复用于会员/订户/权限类变更
+    workflow_relation: 执行 Agent 调用，产出执行证据
+  - name: verify.result
+    purpose: 执行结果核验与满意度确认
+    input: 执行证据
+    output: 核验报告 + 满意度结果
+    call_condition: 执行动作完成
+    depends_on: [工单系统, 短信/IM渠道]
+    failure_handling: 核验不一致时标记异常并升级
+    security: 满意度数据脱敏；证据只读
+    reuse: 交付验收、回访核验
+    workflow_relation: 核验 Agent 调用，产出核验上下文
+  - name: review.case
+    purpose: 疑难案例复盘与知识沉淀
+    input: 案例集（核验异常或满意度低）
+    output: 复盘报告、知识/策略更新建议
+    call_condition: 核验异常或满意度低
+    depends_on: [知识库, 指标存储]
+    failure_handling: 复盘失败不影响主流程，仅记录
+    security: 知识写入需人工确认
+    reuse: 质检、培训、运营优化
+    workflow_relation: 复盘 Agent 调用，产出经验上下文

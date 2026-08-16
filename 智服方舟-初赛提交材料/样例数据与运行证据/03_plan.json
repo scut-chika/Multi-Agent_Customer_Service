@@ -1,0 +1,10 @@
+{
+  "ticket_id": "T-20260815-0001",
+  "plan_id": "P-20260815-0001",
+  "actions": [{"action": "refund", "params": {"order_id": "20260815001", "amount": 199.0, "currency": "CNY"}}],
+  "evidence_refs": ["kb:SOP-RF-2026", "kb:policy-refund-window", "case:C-202607-0188"],
+  "risk_level": "high",
+  "approval_required": true,
+  "status": "PLANNED",
+  "owner_agent": "planner-agent"
+}

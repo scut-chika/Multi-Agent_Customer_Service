@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Skill清单</title>
+<style>
+@page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+* { box-sizing: border-box; }
+body { font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+       font-size: 10.5pt; line-height: 1.7; color: #1f2937; margin: 0; }
+h1 { font-size: 20pt; color: #0e2a47; border-bottom: 2.5pt solid #0ea5a4;
+     padding-bottom: 6pt; margin: 0 0 14pt; }
+h2 { font-size: 14pt; color: #0e2a47; margin: 18pt 0 8pt;
+     border-left: 4pt solid #0ea5a4; padding-left: 8pt; }
+h3 { font-size: 12pt; color: #0e2a47; margin: 14pt 0 6pt; }
+p { margin: 6pt 0; }
+strong { color: #0e2a47; }
+blockquote { margin: 8pt 0; padding: 6pt 10pt; background: #f0f9f8;
+             border-left: 3pt solid #0ea5a4; color: #475569; border-radius: 2pt; }
+table { width: 100%; border-collapse: collapse; margin: 10pt 0;
+        table-layout: fixed; font-size: 8pt; }
+th, td { border: 0.6pt solid #cbd5e1; padding: 5pt 6pt; vertical-align: top;
+         word-break: break-word; }
+th { background: #0e2a47; color: #ffffff; font-weight: bold; }
+tr:nth-child(even) td { background: #f8fafc; }
+code { font-family: Consolas, "Courier New", monospace; background: #f1f5f9;
+       padding: 1pt 3pt; border-radius: 2pt; font-size: 90%; color: #0f766e; }
+pre { background: #f1f5f9; border: 0.6pt solid #e2e8f0; border-radius: 4pt;
+      padding: 8pt 10pt; white-space: pre; overflow-wrap: normal;
+      font-family: Consolas, "Courier New", monospace; font-size: 8pt; line-height: 1.4; }
+ul, ol { margin: 6pt 0 6pt 18pt; padding: 0; }
+li { margin: 3pt 0; }
+</style>
+</head>
+<body>
+<h1>核心 Skill 清单（九要素）</h1>
+<blockquote>
+<p>项目：智服方舟——多智能体客服自主闭环平台　|　赛题方向：方向二 · 智能客服自主闭环　|　阶段：初赛</p>
+</blockquote>
+<p>Skill 作为任务能力抽象层，每个 Skill 对应一类可复用任务能力，通过 AgentTeams 统一注册、按需挂载到 Worker。</p>
+<h2>清单总览</h2>
+<table>
+<thead>
+<tr>
+<th>Skill 名称</th>
+<th>用途</th>
+<th>输入 → 输出</th>
+<th>调用条件</th>
+<th>依赖工具</th>
+<th>失败处理</th>
+<th>安全边界</th>
+<th>复用价值</th>
+<th>与多 Agent 协同流程的关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>intake.ingest</code></td>
+<td>多渠道消息接入、归一化与去重</td>
+<td>原始消息集合 → 标准工单（Ticket）</td>
+<td>收到任一渠道新消息</td>
+<td>消息队列、对象存储、向量库（指纹）</td>
+<td>单条解析失败隔离重试；重复冲突合并并记录</td>
+<td>输入消息先脱敏；仅写工单表</td>
+<td>复用于任一多来源工单接入场景</td>
+<td>由聚合 Agent 调用，产出工单上下文</td>
+</tr>
+<tr>
+<td><code>triage.intent</code></td>
+<td>意图识别、分类分级与信息补全</td>
+<td>工单文本 → 意图、槽位、紧急度/风险等级</td>
+<td>工单建档完成</td>
+<td>分类模型/LLM、历史工单库</td>
+<td>置信度低于阈值则转人工追问</td>
+<td>分级字段受 Schema 约束</td>
+<td>复用于客服/运维/政务等工单分诊</td>
+<td>由分诊 Agent 调用，产出分级上下文</td>
+</tr>
+<tr>
+<td><code>plan.policy_rag</code></td>
+<td>基于 RAG 检索策略并生成合规方案</td>
+<td>工单+分级 → 处理方案（含证据引用与风险等级）</td>
+<td>工单完成分级且信息完整</td>
+<td>知识库 RAG（向量库+重排）、历史案例库</td>
+<td>检索不足时明确标注“证据不足”并升级</td>
+<td>只读策略库；方案需合规校验</td>
+<td>复用于任何“查规则出方案”的决策场景</td>
+<td>由方案 Agent 调用，产出方案上下文</td>
+</tr>
+<tr>
+<td><code>exec.refund</code></td>
+<td>退款执行（幂等）</td>
+<td>批准后的退款单 → 退款结果凭证</td>
+<td>方案已批准且含审批凭证</td>
+<td>支付网关 MCP、工单系统</td>
+<td>重试≤3 次；失败触发回滚与升级</td>
+<td>金额阈值、白名单账户校验；需审批凭证</td>
+<td>同族可扩展换货/退票/改签</td>
+<td>由执行 Agent 调用，产出执行证据</td>
+</tr>
+<tr>
+<td><code>exec.account_change</code></td>
+<td>账户信息变更执行（幂等）</td>
+<td>批准后的变更单 → 变更结果凭证</td>
+<td>方案已批准；客户已二次确认</td>
+<td>CRM/账户系统 MCP</td>
+<td>幂等键冲突时查询现状，不重复执行</td>
+<td>敏感字段二次确认+审计</td>
+<td>复用于会员、订户、权限类变更</td>
+<td>由执行 Agent 调用，产出执行证据</td>
+</tr>
+<tr>
+<td><code>verify.result</code></td>
+<td>执行结果核验与满意度确认</td>
+<td>执行证据 → 核验报告+满意度结果</td>
+<td>执行动作完成</td>
+<td>工单系统、短信/IM 渠道</td>
+<td>核验不一致时标记异常并升级</td>
+<td>满意度数据脱敏；证据只读</td>
+<td>复用于交付验收、回访核验</td>
+<td>由核验 Agent 调用，产出核验上下文</td>
+</tr>
+<tr>
+<td><code>review.case</code></td>
+<td>疑难案例复盘与知识沉淀</td>
+<td>案例集 → 复盘报告、知识/策略更新建议</td>
+<td>核验异常或满意度低</td>
+<td>知识库、指标存储</td>
+<td>复盘失败不影响主流程，仅记录</td>
+<td>知识写入需人工确认</td>
+<td>复用于质检、培训、运营优化</td>
+<td>由复盘 Agent 调用，产出经验上下文</td>
+</tr>
+</tbody>
+</table>
+<h2>示例：<code>exec.refund</code> 九要素详解</h2>
+<ol>
+<li><strong>Skill 名称</strong>：<code>exec.refund</code>（退款执行）</li>
+<li><strong>用途</strong>：在方案获批后，按幂等规则调用支付网关完成退款并回写工单，作为“自动执行”环节的代表能力。</li>
+<li><strong>输入与输出</strong>：输入 <code>{ticket_id, refund_order, amount, currency, approved_by, approval_evidence, idempotency_key}</code>；输出 <code>{status: SUCCESS/FAILED, refund_txn_id, evidence, timestamps}</code>。</li>
+<li><strong>调用条件</strong>：方案 Agent 已批准且风险等级 ≤ 自动执行阈值；携带人工审批凭证（高风险时）；客户退款账户校验通过。</li>
+<li><strong>依赖工具</strong>：支付网关 MCP Server、工单系统 MCP Server、审计日志服务。</li>
+<li><strong>失败处理机制</strong>：网络/系统错误自动重试 3 次（指数退避）；幂等键冲突时查询既有结果而非重复退款；连续失败触发人工介入并生成回滚工单。</li>
+<li><strong>安全边界</strong>：仅接受白名单账户与预算内金额；单笔/单日额度超限必须人工审批；全程记录审计日志；密钥由 AgentTeams 密钥管理注入，不落 Prompt。</li>
+<li><strong>复用价值</strong>：换货、退票、改签等资金类操作可复用同一“幂等执行+证据回写+失败升级”模式。</li>
+<li><strong>与多 Agent 协同流程的关系</strong>：由执行 Agent 调用；上游接收方案 Agent 的批准方案，下游将执行证据交给核验 Agent；异常时通过主控 Agent 升级至人工。</li>
+</ol>
+</body>
+</html>

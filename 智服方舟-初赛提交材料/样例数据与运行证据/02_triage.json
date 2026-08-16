@@ -1,0 +1,10 @@
+{
+  "ticket_id": "T-20260815-0001",
+  "intent": "refund",
+  "risk_level": "high",
+  "urgency": "medium",
+  "confidence": 0.94,
+  "slots": {"order_id": "20260815001", "issue": "partially_delivered"},
+  "status": "TRIAGED",
+  "owner_agent": "triage-agent"
+}

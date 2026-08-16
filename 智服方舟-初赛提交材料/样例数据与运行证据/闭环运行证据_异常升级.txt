@@ -1,0 +1,43 @@
+==================================================================
+智服方舟 · 多 Agent 客服自主闭环 —— 运行证据
+==================================================================
+工单号：T-20260816-0008
+TraceID：trace-a60a97a03b86
+运行时间：2026-08-16 22:16:27
+最终状态：ESCALATED
+
+--- 协作过程（Ticket Context 消息流）---
+  [NEW] leader-main: 任务接收：渠道=['social_comment']，开始编排
+  [NEW] skill: 新建工单 T-20260816-0008，渠道=['social_comment']
+  [NEW] intake-agent: 接入完成：首次建档
+  [TRIAGED] leader-main: 任务拆解：分配分诊 Agent
+  [TRIAGED] triage-agent: 意图=unknown 置信度=0.4 过低，升级人工
+  [ESCALATED] leader-main: 升级人工：意图置信度过低(0.4)，转人工分诊
+  [ESCALATED] skill: 复盘完成：待人工复核
+  [ESCALATED] reviewer-agent: 复盘完成：根因=待人工复核，知识更新=1条
+  [ESCALATED] leader-main: ⚠ 升级人工（Human-in-the-loop）：意图置信度过低(0.4)，转人工分诊
+
+--- 结果摘要 ---
+  意图：unknown（置信度 0.4）风险：low
+  方案：-，证据引用：0 份
+  审批：-（-）
+  执行：-
+  核验：-，满意度：-
+  复盘：根因=待人工复核，知识更新=1 条
+  升级：是（意图置信度过低(0.4)，转人工分诊）
+  总耗时：19.0 ms
+
+--- 全链路追踪（Trace）---
+[Agent] leader-main (19.0ms) leader-main
+[Agent] intake-agent (16.3ms) intake-agent
+[MCP] ticketing.ticket.find_by_fingerprint (0.0ms)
+[MCP] ticketing.ticket.create (0.0ms)
+[Agent] triage-agent (0.3ms) triage-agent
+[Agent] reviewer-agent (2.3ms) reviewer-agent
+[MCP] kb.kb.upsert (0.0ms)
+
+Trace 明细：C:\project\src\data\examples\闭环运行trace.json
+证据报告：C:\project\src\data\examples\闭环运行证据.txt
+
+说明：本证据由本地零依赖闭环生成；MCP 为参考实现，迁移真实系统仅需替换工具后端。
+==================================================================

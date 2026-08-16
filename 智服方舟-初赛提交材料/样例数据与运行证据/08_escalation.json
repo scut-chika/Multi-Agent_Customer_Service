@@ -1,0 +1,10 @@
+{
+  "ticket_id": "T-20260816-0008",
+  "created_at": "2026-08-16T10:00:00+08:00",
+  "channels": ["social_comment"],
+  "fingerprint": "fp:sha256:escalation-demo-0008",
+  "dedup": {"matched": false, "strategy": "fingerprint+semantic", "note": "首次建档"},
+  "status": "NEW",
+  "owner_agent": "intake-agent",
+  "raw_snippet": "（脱敏）有人在评论里发了一串看不懂的符号和表情。"
+}

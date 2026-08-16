@@ -1,0 +1,10 @@
+{
+  "ticket_id": "T-20260815-0001",
+  "idempotency_key": "refund:T-20260815-0001:P-20260815-0001:001",
+  "tool": "payment_gateway.refund.create",
+  "result_status": "SUCCESS",
+  "txn_id": "TX-20260815-00921",
+  "evidence": {"refund_txn_id": "TX-20260815-00921", "amount": 199.0, "currency": "CNY", "receipt_url": "s3://evidence/t-0001/refund.png"},
+  "status": "EXECUTED",
+  "owner_agent": "executor-agent"
+}

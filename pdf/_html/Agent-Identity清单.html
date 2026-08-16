@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Agent-Identity清单</title>
+<style>
+@page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+* { box-sizing: border-box; }
+body { font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+       font-size: 10.5pt; line-height: 1.7; color: #1f2937; margin: 0; }
+h1 { font-size: 20pt; color: #0e2a47; border-bottom: 2.5pt solid #0ea5a4;
+     padding-bottom: 6pt; margin: 0 0 14pt; }
+h2 { font-size: 14pt; color: #0e2a47; margin: 18pt 0 8pt;
+     border-left: 4pt solid #0ea5a4; padding-left: 8pt; }
+h3 { font-size: 12pt; color: #0e2a47; margin: 14pt 0 6pt; }
+p { margin: 6pt 0; }
+strong { color: #0e2a47; }
+blockquote { margin: 8pt 0; padding: 6pt 10pt; background: #f0f9f8;
+             border-left: 3pt solid #0ea5a4; color: #475569; border-radius: 2pt; }
+table { width: 100%; border-collapse: collapse; margin: 10pt 0;
+        table-layout: fixed; font-size: 8pt; }
+th, td { border: 0.6pt solid #cbd5e1; padding: 5pt 6pt; vertical-align: top;
+         word-break: break-word; }
+th { background: #0e2a47; color: #ffffff; font-weight: bold; }
+tr:nth-child(even) td { background: #f8fafc; }
+code { font-family: Consolas, "Courier New", monospace; background: #f1f5f9;
+       padding: 1pt 3pt; border-radius: 2pt; font-size: 90%; color: #0f766e; }
+pre { background: #f1f5f9; border: 0.6pt solid #e2e8f0; border-radius: 4pt;
+      padding: 8pt 10pt; white-space: pre; overflow-wrap: normal;
+      font-family: Consolas, "Courier New", monospace; font-size: 8pt; line-height: 1.4; }
+ul, ol { margin: 6pt 0 6pt 18pt; padding: 0; }
+li { margin: 3pt 0; }
+</style>
+</head>
+<body>
+<h1>Agent Identity 清单</h1>
+<blockquote>
+<p>项目：智服方舟——多智能体客服自主闭环平台　|　赛题方向：方向二 · 智能客服自主闭环　|　阶段：初赛</p>
+</blockquote>
+<h2>一、协同总览</h2>
+<p>系统采用 AgentTeams 的 <strong>Leader-Worker（主管+执行者）</strong> 组织模型：</p>
+<ul>
+<li><strong>Leader（主控 Agent）</strong>：理解任务、拆解、编排、上下文路由与状态追踪，是唯一持有全局上下文视图的角色。</li>
+<li><strong>Worker（职能 Agent）</strong>：按职能划分的专职执行者，各自拥有独立身份、模型配置与工具权限（RBAC 最小授权）。</li>
+</ul>
+<pre><code class="language-text">                 ┌──────────────────────────┐
+                 │  主控 Agent（Leader）      │
+                 │  编排·路由·状态追踪·升级    │
+                 └────────────┬─────────────┘
+       ┌──────────┬───────────┼───────────┬──────────┐
+   ┌───▼───┐ ┌───▼───┐ ┌───▼───┐ ┌───▼───┐ ┌───▼───┐ ┌───▼───┐
+   │ 聚合   │ │ 分诊   │ │ 方案   │ │ 执行   │ │ 核验   │ │ 复盘   │
+   │ Agent  │ │ Agent  │ │ Agent  │ │ Agent  │ │ Agent  │ │ Agent  │
+   └───────┘ └───────┘ └───────┘ └───────┘ └───────┘ └───────┘
+</code></pre>
+<h2>二、Identity 清单</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Agent</th>
+<th>身份属性（角色定位）</th>
+<th>能力边界（能做什么 / 不做什么）</th>
+<th>协同关系</th>
+<th>权限与安全约束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>主控 Agent（Leader）</td>
+<td>团队负责人 / 值班长：理解任务目标，拆解并编排多 Agent 流程，维护全局状态</td>
+<td>能做：任务拆解、调度、上下文路由、冲突仲裁、升级决策、结果汇总。不做：直接操作业务系统，不生成领域处理方案</td>
+<td>与全部 Worker 双向协作；接收外部任务输入；向人工（Human）发起审批与干预请求</td>
+<td>具备全局只读上下文与调度权限；无业务写权限；操作全部留痕</td>
+</tr>
+<tr>
+<td>2</td>
+<td>聚合 Agent（Intake）</td>
+<td>前台接待员：多渠道接入、消息归一化、去重合并、工单建档</td>
+<td>能做：解析邮件/IM/电话转写/社媒评论，提取实体，按会话指纹去重，生成标准工单。不做：意图判断、业务处理</td>
+<td>上游：多渠道接入；下游：工单交予分诊 Agent；去重冲突上报主控 Agent</td>
+<td>仅访问消息接入队列与工单表；消息落库前脱敏</td>
+</tr>
+<tr>
+<td>3</td>
+<td>分诊 Agent（Triage）</td>
+<td>分诊护士：意图识别、分类分级、情绪与紧急度评估</td>
+<td>能做：意图/槽位提取，紧急度与风险分级，信息补全追问。不做：生成处理动作、修改工单状态为处理中</td>
+<td>上游：聚合 Agent；下游：将带分级标签的工单交给方案 Agent；低置信度转人工或主控</td>
+<td>只读工单内容；分级标签写入需遵循 Schema</td>
+</tr>
+<tr>
+<td>4</td>
+<td>方案 Agent（Planner）</td>
+<td>政策顾问 / 方案师：结合 RAG 检索生成合规处理方案</td>
+<td>能做：检索 SOP/产品手册/历史案例，生成退款/换货/账户变更等方案，标注依据与风险等级，发起审批建议。不做：直接执行、绕过政策生成方案</td>
+<td>上游：分诊 Agent；调用知识库 RAG；下游：将方案提交执行 Agent；风险高时经主控发起人工审批</td>
+<td>只读知识库与历史案例；方案必须携带证据引用与合规校验结果</td>
+</tr>
+<tr>
+<td>5</td>
+<td>执行 Agent（Executor）</td>
+<td>柜面操作员：按已批准方案调用系统完成动作</td>
+<td>能做：经 Skill/MCP 调用工单、支付、ERP、CRM 等系统；幂等控制、重试与回滚。不做：擅自变更方案内容、超授权额度执行</td>
+<td>上游：方案 Agent（须携带审批状态）；下游：执行证据写入工单；异常上报核验 Agent 与主控</td>
+<td>仅持有所需动作的最小权限 Token；高危操作必须携带审批通过凭证</td>
+</tr>
+<tr>
+<td>6</td>
+<td>核验 Agent（Verifier）</td>
+<td>质检员：校验执行结果、收集满意度确认、生成核验报告</td>
+<td>能做：比对金额/状态/凭证等证据，触发满意度确认（短信/IM），生成核验报告与证据包。不做：重新执行业务动作</td>
+<td>上游：执行 Agent；下游：将核验报告交主控 Agent 归档，异常触发复盘</td>
+<td>只读执行证据；满意度问卷需脱敏；报告留痕审计</td>
+</tr>
+<tr>
+<td>7</td>
+<td>复盘 Agent（Reviewer）</td>
+<td>分析师：疑难/失败案例复盘、根因分析、知识沉淀</td>
+<td>能做：聚类疑难工单，根因分析，生成复盘报告，更新知识库与 Skill 策略，提出流程优化建议。不做：处理实时工单、直接修改生产 Skill 配置（需人工确认）</td>
+<td>上游：核验 Agent 与主控提供案例；下游：知识库写入、Skill 更新建议提交人工确认</td>
+<td>知识写入与 Skill 变更需审批；访问历史数据需合规授权</td>
+</tr>
+</tbody>
+</table>
+<h2>三、协作规则摘要</h2>
+<ol>
+<li><strong>单一领导权</strong>：同一时刻一个工单仅由一个 Leader 编排实例负责，避免双头指挥。</li>
+<li><strong>最小授权</strong>：每个 Worker 仅拥有完成本职所需的数据与工具权限，跨权限调用必须经主控路由。</li>
+<li><strong>证据先行</strong>：任何自动执行动作必须携带方案引用与证据，未附证据的动作视为非法并拒绝执行。</li>
+<li><strong>人工兜底</strong>：高风险动作、低置信度意图、执行异常无法自动恢复时，均升级至人工审批/干预（Human-in-the-loop）。</li>
+</ol>
+</body>
+</html>

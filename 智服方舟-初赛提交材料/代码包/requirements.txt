@@ -1,0 +1,2 @@
+# 零第三方依赖：仅需 Python 3.10+ 标准库
+# 可选：DASHSCOPE_API_KEY / OPENAI_API_KEY（真实大模型增强分诊）

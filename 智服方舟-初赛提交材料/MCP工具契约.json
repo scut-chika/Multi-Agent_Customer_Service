@@ -1,0 +1,70 @@
+{
+  "description": "外部工具集成契约：REST 契约先行，后续迁移 MCP 仅需协议适配层",
+  "tools": [
+    {
+      "name": "ticket.create",
+      "entry": "POST /api/v1/tickets",
+      "auth": "OAuth2 client-credentials, scope=ticket:write",
+      "params": {"ticket_id": "string", "channels": "string[]", "fingerprint": "string", "status": "string"},
+      "returns": {"ticket_id": "string", "created_at": "datetime"},
+      "permission": "本部门工单读写",
+      "retry": "3次指数退避",
+      "idempotency": "ticket_id 唯一",
+      "audit": "全量审计",
+      "degradation": "故障时降级邮件工单",
+      "mcp_name": "ticketing-mcp.ticket_create"
+    },
+    {
+      "name": "refund.create",
+      "entry": "POST /api/v1/refunds",
+      "auth": "OAuth2 + approval-token",
+      "params": {"order_id": "string", "amount": "number", "currency": "string", "idempotency_key": "string"},
+      "returns": {"refund_txn_id": "string", "status": "string"},
+      "permission": "退款额度受限额策略约束",
+      "retry": "3次指数退避",
+      "idempotency": "idempotency_key 全局唯一",
+      "audit": "含审批凭证",
+      "degradation": "降级转人工退款",
+      "mcp_name": "payment-mcp.refund_create"
+    },
+    {
+      "name": "account.update",
+      "entry": "PATCH /api/v1/accounts/{id}",
+      "auth": "OAuth2 + approval-token",
+      "params": {"customer_id": "string", "field": "string", "old": "string", "new": "string"},
+      "returns": {"changed": "boolean", "updated_at": "datetime"},
+      "permission": "白名单字段，二次确认",
+      "retry": "2次",
+      "idempotency": "变更前后值对拍",
+      "audit": "含变更前后值",
+      "degradation": "降级转人工",
+      "mcp_name": "crm-mcp.account_update"
+    },
+    {
+      "name": "kb.search",
+      "entry": "POST /api/v1/kb/search",
+      "auth": "API Key, scope=kb:read",
+      "params": {"query": "string", "top_k": "integer", "filters": "object"},
+      "returns": {"hits": [{"doc_id": "string", "score": "number", "snippet": "string"}]},
+      "permission": "只读",
+      "retry": "2次",
+      "idempotency": "无状态",
+      "audit": "查询审计",
+      "degradation": "返回缓存结果",
+      "mcp_name": "kb-mcp.kb_search"
+    },
+    {
+      "name": "notify.send",
+      "entry": "POST /api/v1/notifications",
+      "auth": "OAuth2, scope=notify:template",
+      "params": {"channel": "string", "template": "string", "params": "object"},
+      "returns": {"message_id": "string", "status": "string"},
+      "permission": "仅模板发送，禁自定义内容",
+      "retry": "3次",
+      "idempotency": "消息ID去重",
+      "audit": "审计",
+      "degradation": "降级换渠道",
+      "mcp_name": "notify-mcp.notify_send"
+    }
+  ]
+}
